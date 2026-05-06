@@ -15,6 +15,7 @@ A **Prototypical Network (ProtoNet)**-based approach for Network Intrusion Detec
 | [`update_plan/02_Production_NIDS_and_ProtoNet_Advantage.md`](update_plan/02_Production_NIDS_and_ProtoNet_Advantage.md) | How production NIDS work + ProtoNet's deployment advantages |
 | [`update_plan/03_Full_Paper_Rewrite_Strategy.md`](update_plan/03_Full_Paper_Rewrite_Strategy.md) | Complete section-by-section paper rewrite plan |
 | [`update_plan/04_Implementation_Plan.md`](update_plan/04_Implementation_Plan.md) | Week-by-week code roadmap (7 weeks to SOTA) |
+| [`update_plan/05_Temporal_Features_Changes.md`](update_plan/05_Temporal_Features_Changes.md) | What changes with V3's 10 new temporal features (pipeline, model, NaN handling, ablation) |
 
 ## 🧭 Reading Order
 
@@ -28,6 +29,8 @@ A **Prototypical Network (ProtoNet)**-based approach for Network Intrusion Detec
 03_Full_Paper_Rewrite_Strategy.md  (the new paper)
         ↓
 04_Implementation_Plan.md  (how to build it)
+        ↓
+05_Temporal_Features_Changes.md  (V3 temporal feature changes)
 ```
 
 ## 🎯 Project Goal
