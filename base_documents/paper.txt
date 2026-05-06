@@ -1,0 +1,442 @@
+\documentclass[conference]{IEEEtran}
+\IEEEoverridecommandlockouts
+\usepackage{cite}
+\usepackage{amsmath,amssymb,amsfonts}
+\usepackage{algorithmic}
+\usepackage{graphicx}
+\usepackage{textcomp}
+\usepackage{xcolor}
+\usepackage{tikz}
+\usepackage{graphicx}
+\usepackage{parskip}
+\usepackage{longtable}
+\usepackage{tikz}
+\usepackage{float}
+\usepackage{tabularx}
+\usepackage{amsmath}
+
+\def\BibTeX{{\rm B\kern-.05em{\sc i\kern-.025em b}\kern-.08em
+    T\kern-.1667em\lower.7ex\hbox{E}\kern-.125emX}}
+\begin{document}
+
+\title{Prototypical Network for Network Intrusion Detection System using Deep Learning\\
+{\footnotesize \textsuperscript{}}
+}
+
+\author{\IEEEauthorblockN{Prof Dr. Sandip Shinde}
+\IEEEauthorblockA{\textit{Computer Engineering} \\
+\textit{Vishwakarma Institute of Technology}\\
+Pune, India\\
+sandeep.shinde@vit.edu}
+\and
+\IEEEauthorblockN{Parth Nitin Mule}
+\IEEEauthorblockA{\textit{Department of Computer Engineering} \\
+\textit{Vishwakarma Institute of Technology}\\
+Pune, India\\
+parth.mule21@vit.edu}
+}
+
+\maketitle
+
+\begin{abstract}
+This paper addresses the challenges of classifying network traffic data to detect cybersecurity attacks, with a focus on solving problems like data imbalance and different attack vectors. Traditional Machine Learning Models struggle with these issues, which leads to poor generalization and bias towards typical traffic. We propose an approach based on the Prototypical Network Architecture that utilizes Euclidean distance-based classification to centroids that allows the model to accurately identify a variety of attacks, including those with poor training data. We incorporate resampling techniques to balance the dataset and improve performance. Furthermore, comprehensive evaluation metrics such as centroid visualization are used to demonstrate the robustness of the model. While our approach generalizes well across all classes, its weighted average falls short of state-of-the-art models. This work highlights the potential of deep learning methods to effectively detect network intrusions.
+\end{abstract}
+
+\begin{IEEEkeywords}
+Network Intrusion Detection System(NIDS), Explainable AI (XAI), Interpretable AI, Prototypical Network, Deep Learning, Cybersecurity.
+\end{IEEEkeywords}
+
+\section{Introduction}
+2Network security is a top priority in today's digital landscape because cyber-attacks are becoming more frequent and sophisticated. Detecting network attacks while maintaining integrity of data and operations is crucial to the industry. However, the complex, high-dimensional and unbalanced nature of network data poses a significant challenge to classifying network traffic to different attack types. This research addresses the problem of accurately classifying network traffic, specifically to detect and differentiate between multiple types of attacks, such as denial-of-service (DoS), distributed denial-of-service (DDoS), and other emerging threats.
+
+Network intrusion detection systems aim to distinguish the norm from security-related anom-
+alies and detect attacks on computer networks [20].The significance of network intrusion detection goes beyond isolated security incidents. Cyberattacks can lead to data breaches, operational disruption, and financial loss, with effects that can ripple across industries and public sectors. As traditional methods like rule-based IDS's struggle to keep up with sophisticated attack vectors due to inefficient rule induction, machine learning (ML) and deep learning (DL) approaches present a promising future. These methods allow systems to continuously identify anomalous behavior and recognize complex traffic patterns without constant human intervention. Our research aims to advance these methods by providing a scalable and adaptive solution to the growing cybersecurity field.
+
+Classifying network traffic accurately is an inherent challenge due to the complexity of network data. Firstly, attack data in network traffic is minimal compared to benign traffic, resulting in highly imbalanced datasets that are biased towards benign traffic patterns. Secondly, the lack of attack data of novel attacks and the large amount of samples required by deep learning (DL) approaches to effectively model them is a hindrance to effectively classify or detect these attacks. Furthermore, network traffic is high dimensional, containing diverse features like protocol types, packet sizes, packet stream duration and timestamps, all of which need to be processed to find useful attack indicators. The features in the datasets also vary by the probing tool used to capture and process them. Finally, network data is also sequential, requiring models to be able to capture temporal dependencies or to be modeled on the network flows. Standard classification techniques are therefore insufficient because of the high dimensionality and imbalance of network traffic data.
+
+Various attempts have been made at network traffic classification or network intrusion detection using machine learning (ML) or deep learning (DL) fall short of the requirements of modern network security requirements and deployments. Machine learning (ML) or deep learning (DL) models depend on their static architecture for classification, which limits their ability to detect new or evolving attack types. Furthermore, these techniques frequently exhibit a lack of resilience when dealing with unbalanced datasets, which leads to decreased accuracy for attack classes that are underrepresented. Many techniques also tend to use outdated datasets to achieve high accuracy on the given task and not for a generalized scenario. Our approach differs by utilizing a Prototypical Network (ProtoNet) architecture, which supports few-shot learning for introducing new classes and emphasizes similarity-based classification through Euclidean distance. This allows our model to generalize across diverse attack types, while the incorporation of resampling techniques addresses class imbalance, improving accuracy across all categories.
+
+Our study introduces a network intrusion detection model based on Prototypical Network Architecture with Euclidean distance-based classification towards the closest centroid while addressing the class imbalance issue through resampling. Our model improves the overall accuracy across classes by providing classification around the class centroids generated by the mean of the embeddings of each class. This allows us to generate centroid-based visualizations to make the model more interpretable and delineate classification boundaries, aiding in model evaluation. Our findings show that this method is a useful tool for real-time network security, since it greatly improves the detection of uncommon attack types and responds well to emerging threats. However, some limitations include the periodic need to update the model as new attack types emerge.  This work underscores the potential of deep learning (DL) for adaptive, scalable cybersecurity solutions while highlighting areas for future improvement.
+
+\section{Literature Review}
+\label{sec: Literature Review}    
+
+Niknami et al. proposed PTN-IDS, an intrusion detection system based on Prototypical Networks within a meta-learning framework. Their model achieved significant accuracy (91.02\%) and F1-score (92.96\%) for 5-shot binary classification on the CIC-IDS 2017 and CIC-IDS 2018 datasets. The work also involved a comprehensive sensitivity analysis, highlighting the model’s robustness in a few-shot learning context [1]. Sun et al. extended Prototypical Network approaches by integrating a temporal-spatial feature fusion method using capsules and an attention mechanism for classification. Their model achieved high precision, recall, and F1-scores (0.9649, 0.9532, and 0.9590, respectively) with an overall accuracy of 95.22\% [2]. Hnamte et al. developed a two-stage deep learning model combining Long-Short Term Memory (LSTM) and Auto-Encoders (AE) for balancing dimensionality reduction and feature retention. Tested on the CICIDS2017 and CSE-CIC-IDS 2018 datasets, the model achieved 99.1\% accuracy and recall, and 99.07\% precision. While effective in handling high-dimensional data, the reliance on specific datasets raises concerns about generalizability across diverse network environments [3]. Ravi et al. proposed a recurrent deep learning-based ensemble meta-classifier with kernel-based principal component analysis (KPCA) for feature selection. The model demonstrated impressive performance on multiple datasets, including KDD-Cup-1999, UNSW-NB15, WSN-DS, and CICIDS2017, achieving up to 99\% accuracy [4].
+
+Cao et al. introduced a model that combines Convolutional Neural Networks (CNNs) and Gated Recursive Units (GRUs). Using a hybrid sampling approach with ADASYN and RENN, their model achieved remarkable accuracy on NSL-KDD (99.69\%), UNSW-NB15 (86.25\%), and CIC-IDS2017 (99.65\%). However, the significant drop in performance on the UNSW-NB15 dataset suggests limitations in generalizing across datasets with varied characteristics [5]. Du et al. proposed NIDS-CNNLSTM, a deep learning-based classification model evaluated on the UNSW-NB15 dataset. Although the model achieved high accuracy (0.829) and low false positive rates (0.0014), its recall (0.49) and F1-score (0.495) indicate suboptimal performance in distinguishing between certain attack classes [6].  Halbouni et al. presented a CNN-LSTM hybrid model for intrusion detection, achieving accuracy scores of 99.64\%, 94.53\%, and 99.67\% on CIC-IDS2017, UNSW-NB15, and WSN-DS datasets, respectively [7].Said et al. designed a CNN-BiLSTM hybrid model for software-defined networking environments, demonstrating strong performance on NSL-KDD and UNSW-NB15 datasets, with an overall accuracy of 97.12\%. While the model supports both binary and multiclass classification, its recall varies significantly across attack classes, highlighting challenges in handling diverse attack types [8]. Khan et al. introduced a two-stage deep learning model (TSDL) that uses a stacked auto-encoder and softmax classifier for binary and multiclass classification. Their model achieved 89.13\% accuracy and a false alarm rate (FAR) of 0.7495\% on the UNSW-NB15 dataset. Despite its innovative mechanism, the model struggled with imbalanced datasets, particularly in multiclass scenarios [9]. Mushtaq et al. also proposed a two-stage IDS combining Auto-Encoders and LSTMs, achieving 89\% accuracy on the NSL-KDD dataset. While effective in detecting attacks, the model uses an outdated dataset [11]. Qazi et al. developed the Zero-Touch Network Security (ZTNS) system, a deep learning-based IDS using a 1-D CNN with five sequential layers. Evaluated on the CIC-IDS dataset, the model achieved exceptional performance, with 99.8\% accuracy and significant precision and recall metrics [11].
+
+\section{Problem Statement}
+
+\label{sec: Problem Statement}
+The primary objective is to effectively classify network traffic into benign or malicious classes, considering the challenges of imbalanced datasets, novel attack types, and high-dimensional data. Existing solutions either fail to adequately address data imbalance or lack the flexibility to adapt to emerging threats, resulting in inaccurate detection and classification of infrequent attack types. This study focuses on overcoming these challenges using prototypical networks to improve classification accuracy and robustness for real-world network intrusion scenarios.
+
+\section{Proposed Methodology}
+
+\subsection{Dataset Description}
+
+\begin{table}[H]
+\scriptsize % Adjust the font size
+\centering
+\caption{List of Features in the NF-UQ-NIDS-V2 Dataset}
+\label{nf}
+\renewcommand{\arraystretch}{1.2} % Increase row spacing
+\setlength{\tabcolsep}{7pt} % Adjust column spacing for compactness
+\begin{tabular}{|p{4cm}|p{4cm}|}
+\hline
+\multicolumn{2}{|c|}{\textbf{Features}} \\ \hline
+L4\_SRC\_PORT & TCP\_WIN\_MAX\_OUT \\ \hline
+L4\_DST\_PORT & ICMP\_TYPE \\ \hline
+PROTOCOL & ICMP\_IPV4\_TYPE \\ \hline
+L7\_PROTO & DNS\_QUERY\_ID \\ \hline
+IN\_BYTES & DNS\_QUERY\_TYPE \\ \hline
+OUT\_BYTES & DNS\_TTL\_ANSWER \\ \hline
+IN\_PKTS & FTP\_COMMAND\_RET\_CODE \\ \hline
+OUT\_PKTS & MIN\_TTL \\ \hline
+FLOW\_DURATION\_MILLISECONDS & MAX\_TTL \\ \hline
+TCP\_FLAGS & LONGEST\_FLOW\_PKT \\ \hline
+CLIENT\_TCP\_FLAGS & SHORTEST\_FLOW\_PKT \\ \hline
+SERVER\_TCP\_FLAGS & MIN\_IP\_PKT\_LEN \\ \hline
+DURATION\_IN & MAX\_IP\_PKT\_LEN \\ \hline
+DURATION\_OUT & SRC\_TO\_DST\_SECOND\_BYTES \\ \hline
+RETRANSMITTED\_IN\_BYTES & DST\_TO\_SRC\_SECOND\_BYTES \\ \hline
+RETRANSMITTED\_IN\_PKTS & RETRANSMITTED\_OUT\_BYTES \\ \hline
+RETRANSMITTED\_OUT\_PKTS & RETRANSMITTED\_OUT\_PKTS \\ \hline
+SRC\_TO\_DST\_AVG\_THROUGHPUT & NUM\_PKTS\_UP\_TO\_128\_BYTES \\ \hline
+DST\_TO\_SRC\_AVG\_THROUGHPUT & NUM\_PKTS\_128\_TO\_256\_BYTES \\ \hline
+NUM\_PKTS\_256\_TO\_512\_BYTES & NUM\_PKTS\_512\_TO\_1024\_BYTES \\ \hline
+NUM\_PKTS\_1024\_TO\_1514\_BYTES & TCP\_WIN\_MAX\_IN \\ \hline
+\end{tabular}
+\end{table}
+
+There are various datasets available for network intrusion detection, these are namely the KDD Cup’99, NSL-KDD, UNSW NB-15, TON-IoT, UGR’16, CIC-IDS 2017 and CIC-IDS 2018. The DARPA datasets (1998, 1999), foundational in intrusion detection research, consist of seven and five weeks of network traffic with attacks like DoS, buffer overflow, and port scans. However, they are criticized for redundancy and artificial attack injections. The KDD99 dataset, derived from DARPA data, includes approximately 4.9 million records categorized into attacks such as DoS, probing, U2R, and R2L, represented by 41 features. Despite its extensive use, its outdated patterns prompted the creation of NSL-KDD, which addressed redundancy and class imbalance, offering a more practical benchmark. UNSW-NB15, with 82,332 training and 175,341 testing samples, introduces a broader range of modern attacks like Fuzzers, Reconnaissance, and Shellcode. CICIDS2017 further includes over 1 million flows of user behavior and attacks such as Heartbleed, botnets, and DDoS, with detailed protocol-level insights.
+
+Specialized datasets address unique domains. BoT-IoT includes over 72 million records simulating IoT-based attacks, while Kyoto 2006+ features over 93 million honeypot sessions. CICDDoS2019 and CICDoS2017 focus on DDoS and application-layer DoS attacks, respectively. CTU-13 captures 13 botnet scenarios, and NDSec-1 combines network traces with system logs for attacks like SQL injection and port scans. Industrial datasets, such as the ICS cyberattack datasets and IEEE 300-bus, represent critical infrastructure attacks. The NF-UQ-NIDS-V2 dataset integrates four prominent datasets (UNSW-NB15, BoT-IoT, ToN-IoT, and CSE-CIC-IDS2018), comprising 75,987,976 records with realistic distributions (33.12\% benign, 66.88\% attack), making it a robust and comprehensive dataset for modern intrusion detection research.
+
+The dataset used to train the Prototypical NIDS is the NF-UQ-NIDS-V2 Dataset[19]. The dataset was collected by converting raw PCAP files into the Netflow v9 format with 43 extended features. NetFlow is a network protocol developed by Cisco for collecting IP traffic information and monitoring network flow. A flow is a set of packets that share common properties, such as the same source and destination IP addresses, source and destination ports, and the same protocol. NetFlow v9 is an extensible version of the original NetFlow protocol (v5) and is used to collect information about network traffic and performance. NetFlow V9 is high flexible because it uses a template-based approach. This allows for the export of a wide variety of features, including custom fields based on the network specifications.
+
+This feature set has been extracted from well known datasets. The NF-UQ-NIDS-v2 dataset has been formed by merging the datasets UNSW-NB15, BoT-IoT, ToN-IoT, and CSE-CIC-IDS2018. The merged dataset has been converted to the NetFlow V9 format as mentioend previously. The NF-UQ-NIDS dataset has a total of 75,987,976 records, out of which 25,165,295 (33.12\%) are benign flows and 50,822,681 (66.88\%) are attack flows. The specific makeup of the data set is mentioned in the following.
+
+For our model, we have taken the first 2,000,000 rows of the dataset to work on.
+The makeup of the columns is as follows.
+
+\begin{table}[H]\scriptsize % Reduce the font size for compactness
+\centering
+\caption{Filtered NF-UQ-NIDS-v2 Distribution}
+\label{uq}
+\renewcommand{\arraystretch}{1.2} % Increase row spacing slightly
+\setlength{\tabcolsep}{1pt} % Reduce horizontal padding
+\begin{tabular}{|p{2cm}|p{1cm}|p{2cm}|p{1cm}|}
+\hline
+\textbf{Class}       & \textbf{Count} & \textbf{Class}       & \textbf{Count} \\ \hline
+Benign               & 661913         & DDoS                 & 572211         \\ \hline
+DoS                  & 470845         & Scanning             & 100396         \\ \hline
+Reconnaissance       & 68822          & XSS                  & 18978          \\ \hline
+Password             & 30046          & Injection            & 18143          \\ \hline
+Bot                  & 3806           & Brute Force          & 3371           \\ \hline
+Infiltration         & 3096           & Exploits             & 827            \\ \hline
+Fuzzers              & 594            & Backdoor             & 480            \\ \hline
+Generic              & 449            &                      &                \\ \hline
+\end{tabular}
+\end{table}
+
+\subsection{System Architecture}
+\label{sec: System Architecture}
+
+The system architecture for the Prototypical Network-based network traffic classification model is composed of several interconnected modules that work together to process and classify network traffic data. The system begins with the data collection layer, where raw network traffic is gathered from CSV files containing flow data. This data is then passed to the data processing layer, where it undergoes cleaning, scaling, normalization, and resampling to ensure it is prepared for feature extraction.
+
+Following data preprocessing, the feature extraction phase involves the transformation of raw network traffic data into high-dimensional embeddings using a neural network encoder. This encoder consists of multiple fully connected layers, equipped with leaky ReLU activation functions, batch normalization, and dropout layers to prevent overfitting and improve generalization. These embeddings capture the underlying patterns in the traffic data, which are essential for accurate classification. Once the embeddings are generated, class centroids are computed by grouping the embeddings according to their respective labels and calculating the mean embedding for each class. These centroids serve as the reference points for the ProtoNet model during the classification process. In the classification phase, ProtoNet utilizes these centroids and computes the Euclidean distance between the embedding of a new data sample and the centroids. The model assigns the label corresponding to the centroid that is closest to the embedding. The model is trained using the embeddings and their corresponding labels.
+
+Once the model is trained, it is evaluated using a test set to measure performance through key metrics. The output and evaluation layer provides feedback on the model’s effectiveness, generating performance metrics such as accuracy, precision, recall, and F1-score. 
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.5\linewidth]{Files/SysArch.png}
+\caption{System Architecture Diagram}
+\label{fig:NetFlow}
+\end{figure}
+
+\subsection{Workflow}
+\label{sec: References}
+
+\subsubsection{Data Preprocessing}
+
+This module prepares the dataset for training and testing of the model. The dataset used is the NF-UQ-NIDS-V2, which contains network flow data in the NetFlow v9 format with 43 extended features. Initial preprocessing involves loading the first 2 million rows to make training computationally feasible.
+The irrelevant features which may induce a bias in the model, such as IPV4\_SRC\_ADDR and IPV4\_DST\_ADDR were removed. Min-Max scaling as show in equation 1 was applied to scale all features between 0 and 1 to ensure uniformity for the model. 
+        
+        \begin{equation} x' = \frac{x - \text{min}(x)}{\text{max}(x) - \text{min}(x)} \end{equation}
+        
+        \noindent
+        where:
+        \begin{itemize}
+        \scriptsize
+        \item $x$: original input value or dataset,
+        \item $x'$: normalized value of $x$,
+        \item $\text{min}(x)$: minimum value in the dataset or feature range,
+        \item $\text{max}(x)$: maximum value in the dataset or feature range,
+        \end{itemize}
+        
+Lastly, classes with fewer than 250 samples were removed to improve class balance. The median of the samples was selected and the class with higher number of samples were down sampled to the median sample which is size whereas the classes with fewer samples were sampled using Synthetic Minority Oversampling Technique, also known as SMOTE which is show in equation 2 to balance the dataset. The median sample size is 18143. The resulting dataset was split into 3 subsets, Training Set (60\%), Validation Set (20\%), and Test Set (20\%).
+
+
+        \begin{equation} x_{\text{new}} = x_{\text{minority}} + \lambda \cdot (x_{\text{neighbor}} - x_{\text{minority}}) \end{equation}
+        
+        \noindent
+        where:
+        \begin{itemize}
+        \scriptsize
+        \item $x_{\text{new}}$: newly generated synthetic sample,
+        \item $x_{\text{minority}}$: original minority class sample,
+        \item $x_{\text{neighbor}}$: randomly selected nearest neighbor of $x_{\text{minority}}$,
+        \item $\lambda$: random value in the range $[0,1]$,
+        \item $x_{\text{neighbor}} - x_{\text{minority}}$: vector difference between the minority sample and its neighbor,
+        \end{itemize}
+
+\subsubsection{Feature Extraction}
+    
+        A Prototypical Network (ProtoNet) is used as the primary model architecture for feature extraction and classification. Prototypical Networks, introduced by Snell et al. (2017), are a form of few-shot learning models that rely on the concept of prototypes for each class. In ProtoNets, a prototype is defined as the mean embedding of all instances belonging to a specific class, and classification is performed by computing the distance between a query instance and the class prototypes. The class whose prototype is closest to the query is assigned to that instance. This framework is well-suited for problems where class representations need to be learned from few examples, making it a compelling choice for classifying attack types in network traffic data, where class imbalance is a significant issue.
+        
+        The feature extraction process used is facilitated by a fully connected neural network that serves as the encoder within the ProtoNet framework. The encoder maps raw network traffic features into a high-dimensional space, where each instance can be compared to the prototypes of various attack types. The architecture of the encoder is as follows:
+        
+    \begin{itemize}
+        \item Input Layer: The input layer consists of 40 neurons, each representing a feature extracted from the raw network traffic data. These features capture the essential characteristics of network flows.
+
+        \item First Hidden Layer: This layer consists of 256 neurons with a Leaky ReLU activation function, which introduces non-linearity while allowing small negative outputs to prevent the issue of dead neurons, often observed with standard ReLU activation functions.
+
+        \item Batch Normalization: After the first hidden layer, batch normalization is applied to stabilize the learning process. This normalization step helps mitigate issues such as internal covariate shift and accelerates training by ensuring that the activations of each layer are properly scaled.
+
+        \item Dropout Layer: A dropout layer with a dropout rate of p=0.5 is employed to reduce the risk of overfitting by randomly deactivating 50\% of the neurons during each training iteration. This encourages the model to learn more robust and generalized features.
+
+        \item Second Hidden Layer: The second hidden layer contains 128 neurons, followed by another application of the Leaky ReLU activation function to refine the learned feature representations.
+
+        \item Output Layer: The output of the encoder is a high-dimensional feature vector that represents the input instance in a space suitable for comparison with the class prototypes.
+
+    \end{itemize}
+
+\subsubsection{Centroid Calculation}
+
+        During training, the embeddings are grouped by class labels to calculate the centroids for each class. The centroids are used to compute the Euclidean distance between each embedding in the batch and the centroids of all classes. After processing all batches in an epoch, centroids are recalculated using all embeddings from the entire dataset. This ensures that the centroids represent the global structure of the embedding space. This ensures that the centroids are calculated dynamically for each batch and used to compute loss (3), while during testing, the final centroids are loaded and used to classify the new samples by finding the nearest centroid. Below is the formula for centroid calculation.
+
+\vspace{5mm} % Add vertical space before the equations
+
+\noindent
+The loss function is given as:
+
+\begin{equation}
+\mathbf{L} = \frac{1}{N} \sum_{i=1}^N \left( - \log \frac{\exp(-\|f(x_i) - c_{y_i}\|^2)}{\sum_{k} \exp(-\|f(x_i) - c_k\|^2)} \right)
+\end{equation}
+
+\noindent
+where:
+\begin{itemize}
+    \scriptsize
+    \item $N$: total number of samples,
+    \item $x_i$: $i$-th input sample,
+    \item $f(x_i)$: feature representation of the $i$-th sample,
+    \item $c_{y_i}$: centroid of the true class $y_i$,
+    \item $c_k$: centroid of the $k$-th class,
+    \item $\|f(x_i) - c_{y_i}\|^2$: squared Euclidean distance between $f(x_i)$ and $c_{y_i}$,
+    \item $\exp(-\|f(x_i) - c_{y_i}\|^2)$: similarity score for $f(x_i)$ and $c_{y_i}$,
+    \item $\sum_{k} \exp(-\|f(x_i) - c_k\|^2)$: normalization sum over all centroids.
+\end{itemize}
+
+\subsubsection{Training and Evaluation}
+
+        The training pipeline includes the Adam Optimizer with learning rate scheduling to decrease the learning rate of the model every 10 epochs. To ensure stability, the gradients are clipped to a maximum norm of 1.0. A centroid-based loss is calculated using negative Euclidean distance to the centroid and cross-entropy. The best model state and centroids are saved during training. Evaluation is done on unseen data and the trained prototypes and encoder model.
+
+\section{Outcome}
+\label{sec:Outcome}
+
+The ProtoNet model demonstrated an overall accuracy of 89\% on the NF-UQ-NIDS-v2 dataset, with a strong macro average F1-score of 0.89. The model exhibited high precision and recall for most attack types, although it struggled with distinguishing benign traffic, achieving a lower F1-score as calculated using Equation 4 in this category. 
+
+\begin{equation}
+\text{F1 Score} = 2 \cdot \frac{\text{Precision} \cdot \text{Recall}}{\text{Precision} + \text{Recall}}
+\end{equation}
+
+
+
+The model excelled in detecting attacks like backdoor, bot, brute-force, DDoS, and DoS, with very high F1-scores for these classes. Other attack types, such as exploits and scanning, also showed competitive performance, with F1-scores ranging from 0.70 to 0.97. The macro-average AUC score of 0.9411 further indicates the model's strong ability to discriminate between attack and benign traffic. However, the challenges in accurately classifying benign traffic suggest areas for improvement in the model's future iterations. 
+
+\begin{table}[htbp]
+\scriptsize
+\centering
+\caption{Classification Report for NF-UQ-NIDS-V2}
+\label{tab:classification_report}
+\renewcommand{\arraystretch}{1.2} % Adjust row spacing
+\setlength{\tabcolsep}{4pt} % Adjust column spacing
+\begin{tabular}{|p{3cm}|p{1.5cm}|p{1.5cm}|p{1.5cm}|}
+\hline
+\textbf{Class Name}    & \textbf{Precision} & \textbf{Recall} & \textbf{F1-Score} \\ \hline
+Backdoor               & 1.00               & 0.93            & 0.96              \\ \hline
+Benign                 & 0.87               & 0.59            & 0.70              \\ \hline
+Bot                    & 1.00               & 1.00            & 1.00              \\ \hline
+Brute Force            & 0.99               & 0.98            & 0.98              \\ \hline
+DDoS                   & 0.95               & 0.96            & 0.96              \\ \hline
+DoS                    & 0.94               & 0.95            & 0.95              \\ \hline
+Exploits               & 0.89               & 0.93            & 0.91              \\ \hline
+Fuzzers                & 0.87               & 0.97            & 0.92              \\ \hline
+Generic                & 0.97               & 0.89            & 0.93              \\ \hline
+Infilteration          & 0.68               & 0.72            & 0.70              \\ \hline
+Reconnaissance         & 0.81               & 0.89            & 0.85              \\ \hline
+Shellcode              & 0.85               & 0.75            & 0.80              \\ \hline
+Theft                  & 0.84               & 0.91            & 0.87              \\ \hline
+Worms                  & 0.97               & 0.97            & 0.97              \\ \hline
+Injection              & 0.78               & 0.92            & 0.84              \\ \hline
+\textbf{Accuracy}      & \multicolumn{3}{c|}{\textbf{0.89}}  \\ \hline
+\textbf{Macro Avg}     & 0.89               & 0.89            & 0.89              \\ \hline
+\textbf{Weighted Avg}  & 0.89               & 0.89            & 0.89              \\ \hline
+\end{tabular}
+\end{table}
+
+
+The confusion matrix show in Table 3 reveals that the model is generally accurate, but struggles with certain classes, particularly in distinguishing between benign and some attack classes. A significant number of misclassifications were observed in the Benign, contributing to the lower F1-score for benign traffic. This can be improved by increasing the sample set for the benign class
+The confusion matrix shows that the model effectively separates attacks like Bot and Backdoor but occasionally misclassifies Generic and Brute Force attacks, as indicated by off-diagonal values.
+
+\begin{figure}[htbp] % Use [htbp] for flexible placement
+\includegraphics[width=\linewidth]{Files/ConfMat.png} % Adjust width to fit within the column
+\caption{Confusion matrix showing classification performance.}
+\label{fig:ConfMat}
+\end{figure}
+
+
+
+The model demonstrates low false positive rates as calculated using equation 5. Table 4 shows that for most attack classes, with the False Positive Rate for Backdoor being 0.0002 and 0.0000 for Bot . However, some attack classes, like DDoS and XSS, show higher false positive rates (0.0034 and 0.0191, respectively), highlighting areas that need improvement in distinguishing between benign and malicious traffic. The mean FPR is 0.1183 which is approximately 1.18\%
+
+\begin{equation}
+\text{FPR} = \frac{\text{False Positives}}{\text{False Positives} + \text{True Negatives}}
+\end{equation}
+
+\vspace{-2mm}
+
+\begin{table}[htbp]
+\scriptsize % Reduce the font size
+\centering
+\renewcommand{\arraystretch}{1.2} % Increase row spacing slightly
+\setlength{\tabcolsep}{6pt} % Adjust horizontal spacing between columns
+\caption{False Positive Rates for Each Class}
+\label{table:false_positive_rates}
+\begin{tabular}{|p{3.5cm}|p{2cm}|}
+\hline
+\textbf{Class Name}    & \textbf{False Positive Rate} \\ \hline
+Backdoor               & 0.0002                       \\ \hline
+Benign                 & 0.0061                       \\ \hline
+Bot                    & 0.0000                       \\ \hline
+Brute Force            & 0.0007                       \\ \hline
+DDoS                   & 0.0034                       \\ \hline
+DoS                    & 0.0040                       \\ \hline
+Exploits               & 0.0086                       \\ \hline
+Fuzzers                & 0.0103                       \\ \hline
+Generic                & 0.0021                       \\ \hline
+Infiltration           & 0.0248                       \\ \hline
+Reconnaissance         & 0.0154                       \\ \hline
+Injection              & 0.0091                       \\ \hline
+MitM                   & 0.0124                       \\ \hline
+Password               & 0.0021                       \\ \hline
+Ransomware             & 0.0191                       \\ \hline
+\end{tabular}
+\end{table}
+
+
+Looking at the 3D representation of the centroids, we are able to visualize the centroids and the attacks classified by them. This allows for easy interpretation of the model and its outputs, allow us to diagnose the prediction and the issues with the model.
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=\linewidth]{Files/ScatterPLOT.png}
+\caption{3D scatter plot showing centroids and distance lines.}
+\label{fig:ScatterPlot}
+\end{figure}
+
+\section{Discussion}
+
+Table 5 shows, the comparative of our model with other models.
+
+\begin{table}[htbp]
+\scriptsize % Reduce font size for the table
+\centering
+\caption{Comparative Analysis of Deep Learning Models for Network Intrusion Detection}
+\label{tab:comparative_analysis}
+\renewcommand{\arraystretch}{1.2} % Adjust row spacing
+\begin{tabular}{|p{3.5cm}|p{1.1cm}|p{1.1cm}|p{0.8cm}|}
+\hline
+\textbf{Model} & \textbf{Accuracy (\%)} & \textbf{F1 Score (\%)} & \textbf{Ref.} \\ \hline
+Random Forest (RF) & 92.71 & 92.71 & [13] \\ \hline
+Convolutional Neural Network (CNN) & 98.67 & 98.67 & [14] \\ \hline
+Bi-LSTM with Attention Mechanism & 90.73 & 89.65 & [15] \\ \hline
+Deep Belief Network (DBN) & 97.50 & 97.50 & [16] \\ \hline
+ResNet152V2 & 99.20 & 99.20 & [17] \\ \hline
+CNN with Embedding & 99.00 & 99.00 & [18] \\ \hline
+Deep Learning-Based Model & 98.50 & 98.50 & [12] \\ \hline
+Prototypical Network (ProtoNet) & 89.00 & 89.00 & My Work \\ \hline
+\end{tabular}
+\end{table}
+
+
+The results of the Prototypical Network (ProtoNet) model demonstrate its efficacy in addressing key challenges in network intrusion detection, particularly class imbalance and high-dimensional data. With an overall accuracy of 89\% and a macro-average F1 score of 0.89, the ProtoNet model effectively classifies a wide variety of attack types while maintaining interpretability through centroid visualization. This performance aligns with the recent trend of leveraging few-shot learning methods to improve classification accuracy for underrepresented classes.
+
+In comparison to other state-of-the-art deep learning models, the ProtoNet model exhibits several strengths that set it apart. For instance, traditional models like Random Forest (RF) achieve an accuracy of 92.71\% on the UNSW-NB15 dataset but struggle with minority classes due to their reliance on feature engineering and a lack of adaptability to imbalanced datasets. Similarly, while convolutional neural networks (CNNs) achieve high accuracy, such as 98.67\% on the CSE-CICIDS2018 dataset, they often underperform in scenarios involving rare attack types. By focusing on class prototypes, ProtoNet effectively mitigates the impact of class imbalance, allowing for higher recall and precision for minority classes, including Backdoor and Bot attacks, where perfect F1 scores of 1.00 were achieved.
+
+The scope of dataset usage also presents an area for improvement. While the evaluation was conducted on the NF-UQ-NIDS-v2 dataset with approximately 279,000 samples, extending this analysis to larger datasets or cross-dataset validation with benchmarks such as CICIDS2017 or UNSW-NB15 could provide more comprehensive insights into the model’s generalizability. Such evaluations would help determine the robustness of ProtoNet in diverse network environments with varying traffic patterns and attack complexities.
+
+Several strategies could be employed to address the identified limitations and further enhance the ProtoNet model. Incorporating temporal dependencies through recurrent architectures, such as RNNs or Transformers, could improve the model’s ability to detect advanced persistent threats (APTs) and multiphase attacks that unfold over time. Additionally, hybridizing ProtoNet with CNNs for feature extraction or Bi-LSTMs for sequential analysis could enhance its overall robustness and accuracy. Adversarial training is another promising approach to improve the model’s resilience against sophisticated evasion techniques. By exposing the model to adversarial examples during training, it could learn to identify and counteract such manipulations, thereby reducing the risk of misclassification.
+
+\section{Future Scope}
+\label{sec:Future Scope}
+
+The Prototypical Network (ProtoNet) model provides a robust foundation for network intrusion detection, particularly in addressing class imbalance and underrepresented attack types. However, several avenues can enhance its applicability in dynamic, real-world scenarios. Incorporating temporal models, such as Recurrent Neural Networks (RNNs), Long Short-Term Memory networks (LSTMs), or Transformers, would enable ProtoNet to detect advanced persistent threats (APTs) and multi-phase attacks that evolve over time. Hybridizing ProtoNet with architectures like CNNs for spatial feature extraction or Bi-LSTMs for temporal sequence modeling can further enhance its robustness and accuracy. Adversarial training is another critical area of exploration, offering improved resilience against evasion techniques by exposing the model to adversarial examples during training. This enhancement is essential for deployment in environments where sophisticated cyber threats are prevalent. Additionally, expanding dataset evaluations to include benchmarks like CICIDS2017 and UNSW-NB15 will ensure better generalizability across diverse network environments and traffic patterns.
+
+Leveraging emerging techniques such as self-supervised learning can also complement ProtoNet's few-shot learning capabilities, enabling it to learn representations from unlabeled data. This approach would be particularly beneficial in scenarios with limited labeled data while maintaining adaptability to novel attack types. These advancements—temporal modeling, hybridization, adversarial training, comprehensive dataset evaluation, and self-supervised learning—can significantly improve ProtoNet’s effectiveness. They will position it as a scalable, resilient, and interpretable solution for tackling evolving cyber threats in complex network systems.
+
+\section{Conclusion}
+\label{sec:Conclusion}
+
+In this paper, a Prototypical Network (ProtoNet) architecture was employed for the task of network traffic classification, specifically for intrusion detection in the NF-UQ-NIDS-v2 dataset. The primary objective was to address the challenges of high-dimensional data, class imbalance, and the need for generalization to unseen attack types. ProtoNets proved to be a robust solution, leveraging class prototypes to achieve accurate and efficient classification, even when faced with a highly imbalanced dataset where attack traffic significantly outweighs benign traffic. The encoder network, designed with Leaky ReLU activations, batch normalization, and dropout regularization, facilitated the transformation of network traffic features into a high-dimensional space conducive to effective classification. The use of Euclidean distance for comparing class prototypes further enhanced the model’s ability to classify attack types with high accuracy, demonstrating the potential of ProtoNets for real-time intrusion detection systems.
+
+The results obtained from the experiments suggest that ProtoNets offer significant advantages over traditional classification models, particularly in terms of handling class imbalance and learning meaningful representations from limited data. This approach has the potential to be extended to a wide range of intrusion detection and network security tasks, where similar challenges of high-dimensionality and data sparsity are prevalent.
+\section*{References}
+
+\begin{thebibliography}{00}
+\bibitem{1} Niknami, N., Mahzoon, V., \& Wu, J. (2024, October). PTN-IDS: Prototypical Network Solution for the Few-shot Detection in Intrusion Detection Systems. In 2024 IEEE 49th Conference on Local Computer Networks (LCN) (pp. 1-9). IEEE.
+
+\bibitem{2}Sun, H., Wan, L., Liu, M., \& Wang, B. (2023). Few-Shot network intrusion detection based on prototypical capsule network with attention mechanism. Plos one, 18(4), e0284632.
+
+\bibitem{3}Hnamte, V., Nhung-Nguyen, H., Hussain, J., \& Hwa-Kim, Y. (2023). A novel two-stage deep learning model for network intrusion detection: LSTM-AE. Ieee Access, 11, 37131-37148.
+
+\bibitem{4}Ravi, V., Chaganti, R., \& Alazab, M. (2022). Recurrent deep learning-based feature fusion ensemble meta-classifier approach for intelligent network intrusion detection system. Computers and Electrical Engineering, 102, 108156.
+
+\bibitem{5}Cao, B., Li, C., Song, Y., Qin, Y., \& Chen, C. (2022). Network intrusion detection model based on CNN and GRU. Applied Sciences, 12(9), 4184.
+
+\bibitem{6}Du, J., Yang, K., Hu, Y., \& Jiang, L. (2023). NIDS-CNNLSTM: Network intrusion detection classification model based on deep learning. IEEE Access, 11, 24808-24821.
+
+\bibitem{7}Said, R. B., Sabir, Z., \& Askerzade, I. (2023). CNN-BiLSTM: A Hybrid Deep Learning Approach for Network Intrusion Detection System in Software Defined Networking with Hybrid Feature Selection. IEEE Access.
+
+\bibitem{8}Halbouni, A., Gunawan, T. S., Habaebi, M. H., Halbouni, M., Kartiwi, M., \& Ahmad, R. (2022). CNN-LSTM: hybrid deep neural network for network intrusion detection system. IEEE Access, 10, 99837-99849.
+
+\bibitem{9}Hnamte, V., Nhung-Nguyen, H., Hussain, J., \& Hwa-Kim, Y. (2023). A novel two-stage deep learning model for network intrusion detection: LSTM-AE. Ieee Access, 11, 37131-37148.
+
+\bibitem{10}Zia, T., Faheem, M. H., Shahzad, K., Imran, M., \& Ahmed, Z. (2024). Zero-Touch Network Security (ZTNS): A Network Intrusion Detection System Based on Deep Learning. IEEE Access.
+
+\bibitem{11} Mushtaq, E., Zameer, A., Umer, M., \& Abbasi, A. A. (2022). A two-stage intrusion detection system with auto-encoder and LSTMs. Applied Soft Computing, 121, 108768.
+
+\bibitem{12}Wang, Y., et al. (2024). Feature fusion for deep learning-based intrusion detection across multiple datasets. Springer Journal of Supercomputing. https://doi.org/10.1007/
+s11227-024-06345-w
+
+\bibitem{13}Ajagbe, O. A., et al. (2024). An analysis of random forest for intrusion detection. Springer. https://doi.org/10.1007/s42979-024-03369-0
+
+\bibitem{14}Alqahtani, S., et al. (2024). A deep learning-based intrusion detection system using CNN for CSE-CICIDS2018. MDPI Applied Sciences, 14(13), 5381. https://doi.org/10.3
+90/app14135381
+
+\bibitem{15} Zhang, X., et al. (2022). Bi-LSTM with attention mechanism for intrusion detection in NSL-KDD dataset. MDPI Electronics, 11(6), 898. https://doi.org/10.3390/electronics
+11060898
+
+\bibitem{16} Yogesh, S., \& Goyal, P. (2024). Deep-belief networks for network security using DARPA dataset. Springer. https://doi.org/10.1007/s10207-024-00896-y
+
+\bibitem{17}Elsayed, M., et al. (2023). A comparative study of ResNet variants for intrusion detection. Springer. https://doi.org/10.1007/s10207-023-00771-2
+
+\bibitem{18}Shone, N., et al. (2020). Deep learning models for network traffic classification using CIDDS. MDPI Future Internet, 12(10), 167. https://doi.org/10.3390/fi12100167
+
+\bibitem{19}Sarhan, M., Layeghy, S. \& Portmann, M. Towards a Standard Feature Set for Network Intrusion Detection System Datasets. Mobile Netw Appl 27, 357–370 (2022). https://doi.org/10.1007/s11036-021-01843-0
+
+\bibitem{20}Chou, D., & Jiang, M. (2021). A survey on data-driven network intrusion detection. ACM Computing Surveys (CSUR), 54(9), 1-36.
+
+\end{thebibliography}
+
+\end{document}
