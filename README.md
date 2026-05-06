@@ -16,6 +16,7 @@ A **Prototypical Network (ProtoNet)**-based approach for Network Intrusion Detec
 | [`update_plan/03_Full_Paper_Rewrite_Strategy.md`](update_plan/03_Full_Paper_Rewrite_Strategy.md) | Complete section-by-section paper rewrite plan |
 | [`update_plan/04_Implementation_Plan.md`](update_plan/04_Implementation_Plan.md) | Week-by-week code roadmap (7 weeks to SOTA) |
 | [`update_plan/05_Temporal_Features_Changes.md`](update_plan/05_Temporal_Features_Changes.md) | What changes with V3's 10 new temporal features (pipeline, model, NaN handling, ablation) |
+| [`update_plan/06_Literature_Survey_Methodology.md`](update_plan/06_Literature_Survey_Methodology.md) | **Complete literature survey** — 50 papers found, tracking method, 6 levels of ProtoNet innovation |
 
 ## 🧭 Reading Order
 
@@ -31,6 +32,8 @@ A **Prototypical Network (ProtoNet)**-based approach for Network Intrusion Detec
 04_Implementation_Plan.md  (how to build it)
         ↓
 05_Temporal_Features_Changes.md  (V3 temporal feature changes)
+        ↓
+06_Literature_Survey_Methodology.md  (literature survey + 50 papers)
 ```
 
 ## 🎯 Project Goal
